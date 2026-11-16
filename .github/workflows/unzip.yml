@@ -1,0 +1,21 @@
+name: unzip
+on:
+  push:
+    paths: ['Broforsgram-site.zip']
+permissions:
+  contents: write
+  pages: write
+jobs:
+  u:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          unzip -o Broforsgram-site.zip
+          rm Broforsgram-site.zip
+          git config user.name bot
+          git config user.email bot@example.com
+          git add -A
+          git commit -m "unzip" || true
+          git push
+          curl -s -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/pages/builds || true
