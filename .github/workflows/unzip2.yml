@@ -1,0 +1,26 @@
+name: unzip2
+on:
+  push:
+  workflow_dispatch:
+permissions:
+  contents: write
+  pages: write
+jobs:
+  u:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          found=0
+          for f in .trashed-*Broforsgr* *.zip; do
+            [ -f "$f" ] || continue
+            if unzip -o "$f"; then found=1; rm -f "$f"; fi
+          done
+          if [ "$found" = 1 ]; then
+            git config user.name bot
+            git config user.email bot@example.com
+            git add -A
+            git commit -m "unzip" || true
+            git push
+            curl -s -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/pages/builds || true
+          fi
